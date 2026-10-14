@@ -8,9 +8,16 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       POSTGRES_DB: ${DB_NAME:-wallet_db}
     ports:
-      - '${DB_PORT:-5050}:5050'
+      # host:container — Postgres always listens on 5432 inside the container.
+      # Host side uses 5434 to avoid clashing with a locally installed Postgres.
+      - '${DB_PORT:-5434}:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_NAME:-wallet_db}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   postgres_data:

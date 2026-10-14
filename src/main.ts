@@ -1,12 +1,12 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule, ObserveInstrument } from './app.module.js';
+import type { NestExpressApplication } from '@nestjs/platform-express';
+import { AppModule } from './app.module.js';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    instrument: ObserveInstrument,
-  });
-  await app.listen(process.env.PORT ?? 4000);
-  const lis = app.getUrl()
-  console.log(`Application running at ${await app.getUrl()}`);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  app.useBodyParser('text', { type: ['text/plain', 'text/*'] });
+
+  await app.listen(process.env.PORT ?? 3000);
 }
-await bootstrap();
+bootstrap();
